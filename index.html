@@ -29,20 +29,14 @@
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
   .app { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
-  .header { margin-bottom: 2rem; }
-  .header h1 { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  .header h1 i { font-size: 20px; color: var(--info-text); }
-  .header p { font-size: 13px; color: var(--text2); margin-top: 5px; }
-  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; }
-  .api-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; }
-  .api-bar input { flex: 1; height: 40px; padding: 0 12px; font-size: 14px; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg); color: var(--text); outline: none; }
-  .api-bar input:focus { border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+  .header { margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header-left h1 { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .header-left h1 i { font-size: 20px; color: var(--info-text); }
+  .header-left p { font-size: 13px; color: var(--text2); margin-top: 5px; }
   .btn { height: 40px; padding: 0 18px; font-size: 14px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: background .15s; }
   .btn:hover { background: var(--bg2); }
   .btn:active { transform: scale(0.98); }
-  .btn.primary { background: #378ADD; color: #fff; border-color: #378ADD; }
-  .btn.primary:hover { background: #185fa5; border-color: #185fa5; }
-  .status { display: none; font-size: 13px; padding: 10px 14px; border-radius: var(--r-md); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .status { font-size: 13px; padding: 10px 14px; border-radius: var(--r-md); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
   .status.info { background: var(--info-bg); color: var(--info-text); }
   .status.success { background: var(--success-bg); color: var(--success-text); }
   .status.error { background: var(--danger-bg); color: var(--danger-text); }
@@ -51,8 +45,8 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.2s infinite; flex-shrink: 0; }
   .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; margin-bottom: 1.25rem; padding: 1rem 1.25rem; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); }
   .filter-group label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
-  .filter-group input, .filter-group select { width: 100%; height: 36px; padding: 0 10px; font-size: 13px; border: 0.5px solid var(--border); border-radius: var(--r-md); background: var(--bg2); color: var(--text); outline: none; }
-  .filter-group input:focus, .filter-group select:focus { border-color: #378ADD; }
+  .filter-group input { width: 100%; height: 36px; padding: 0 10px; font-size: 13px; border: 0.5px solid var(--border); border-radius: var(--r-md); background: var(--bg2); color: var(--text); outline: none; }
+  .filter-group input:focus { border-color: #378ADD; }
   .games-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .games-header span { font-size: 13px; color: var(--text2); }
   .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
@@ -85,25 +79,30 @@
   .stat-range { font-size: 11px; color: var(--text3); margin-top: 2px; }
   .empty { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
   .empty i { font-size: 32px; display: block; margin-bottom: 8px; }
-  .time-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
+  .time-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
   .time-filter label { font-size: 12px; color: var(--text2); white-space: nowrap; }
-  .time-filter input[type=range] { flex: 1; accent-color: #378ADD; }
+  .time-filter input[type=range] { flex: 1; min-width: 80px; accent-color: #378ADD; }
   .time-filter span { font-size: 12px; font-weight: 500; min-width: 32px; text-align: center; }
+  .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 4rem; color: var(--text2); font-size: 14px; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: #378ADD; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-line"></i>Odds Monitor · Série B</h1>
-    <p>Histórico de odds minuto a minuto dos jogos finalizados do Campeonato Brasileiro Série B</p>
-  </div>
-
-  <div class="api-bar">
-    <input type="password" id="apiKey" placeholder="Cole sua API Key da OddsPapi" autocomplete="off">
-    <button class="btn primary" onclick="init()"><i class="ti ti-refresh"></i>Carregar jogos</button>
+    <div class="header-left">
+      <h1><i class="ti ti-chart-line"></i>Odds Monitor · Série B</h1>
+      <p>Histórico de odds minuto a minuto dos jogos finalizados do Campeonato Brasileiro Série B</p>
+    </div>
+    <button class="btn" onclick="loadFixtures()"><i class="ti ti-refresh"></i>Atualizar</button>
   </div>
 
   <div id="status" class="status hidden"></div>
+
+  <div id="loadingEl" class="loading" style="display:none">
+    <div class="spinner"></div> Carregando jogos da Série B...
+  </div>
 
   <div id="filtersSection" style="display:none">
     <div class="filters">
@@ -128,7 +127,7 @@
         <input type="number" id="fOddMax" step="0.01" min="1" placeholder="99.00">
       </div>
       <div class="filter-group" style="display:flex;align-items:flex-end">
-        <button class="btn" onclick="clearFilters()" style="width:100%"><i class="ti ti-x"></i>Limpar filtros</button>
+        <button class="btn" onclick="clearFilters()" style="width:100%"><i class="ti ti-x"></i>Limpar</button>
       </div>
     </div>
   </div>
@@ -166,13 +165,14 @@
 </div>
 
 <script>
+const API_KEY = '7792dc40-ede9-4a15-9e80-3d2e19499d9a'
 const BASE = 'https://api.oddspapi.io/v4'
 const BOOKIE = 'pinnacle'
 const COLORS = ['#378ADD','#1D9E75','#D85A30','#BA7517','#D4537E','#639922','#534AB7']
 const MARKET_NAMES = {'1':'Resultado 1X2','10168':'Resultado 1X2','10':'Dupla Chance','20':'Ambas Marcam','5':'Total de Gols','6':'Handicap Asiático'}
 const OUTCOME_NAMES = {'1':'Casa','2':'Empate','3':'Fora','4':'Casa/Emp','5':'Casa/Fora','6':'Emp/Fora'}
 
-let apiKey='', serieBid=null, allFixtures=[], filteredFixtures=[]
+let serieBid=null, allFixtures=[], filteredFixtures=[]
 let selFixture=null, oddsData={}, chartInst=null, activeMarket=null
 let tMin=0, tMax=120
 
@@ -180,39 +180,47 @@ function setStatus(msg, type='info') {
   const el = document.getElementById('status')
   el.className = `status ${type}`
   el.innerHTML = `<span class="dot"></span>${msg}`
-  if (type==='error'||type==='success') setTimeout(()=>el.className='status hidden',5000)
+  if (type==='error'||type==='success') setTimeout(()=>el.className='status hidden', 4000)
 }
+
+function showLoading(v) { document.getElementById('loadingEl').style.display = v ? 'flex' : 'none' }
 
 async function apiFetch(path, params={}) {
   const url = new URL(BASE+path)
   Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v))
-  const r = await fetch(url, {headers:{'x-api-key':apiKey}})
+  const r = await fetch(url, {headers:{'x-api-key': API_KEY}})
   if (!r.ok) throw new Error(`HTTP ${r.status}`)
   return r.json()
 }
 
 async function init() {
-  apiKey = document.getElementById('apiKey').value.trim()
-  if (!apiKey) { setStatus('Informe a API Key.','error'); return }
-  setStatus('Buscando torneios da Série B...')
+  showLoading(true)
   try {
     const data = await apiFetch('/tournaments', {sportId:1})
     const items = Array.isArray(data)?data:(data.data||data.tournaments||[])
     const found = items.find(t=>/serie.?b/i.test(t.name||'')&&/brazil/i.test(t.country||t.countryName||''))
       || items.find(t=>/serie.?b.*brazil|brazil.*serie.?b/i.test(JSON.stringify(t)))
     if (!found) {
+      showLoading(false)
       const br = items.filter(t=>/brazil/i.test(JSON.stringify(t))).slice(0,4).map(t=>t.name).join(', ')
-      setStatus(`Série B não encontrada. Torneios BR: ${br||'nenhum'}`, 'error'); return
+      setStatus(`Série B não encontrada. Torneios BR: ${br||'nenhum'}`, 'error')
+      return
     }
     serieBid = String(found.id)
-    setStatus(`Série B encontrada (ID ${serieBid}). Carregando jogos...`)
     await loadFixtures()
-  } catch(e) { setStatus(`Erro: ${e.message}`,'error') }
+  } catch(e) {
+    showLoading(false)
+    setStatus(`Erro ao conectar: ${e.message}`, 'error')
+  }
 }
 
 async function loadFixtures() {
+  showLoading(true)
+  document.getElementById('gamesSection').style.display = 'none'
+  document.getElementById('filtersSection').style.display = 'none'
   try {
-    const data = await apiFetch('/fixtures', {tournamentId:serieBid,status:'finished'})
+    if (!serieBid) { await init(); return }
+    const data = await apiFetch('/fixtures', {tournamentId:serieBid, status:'finished'})
     const items = Array.isArray(data)?data:(data.data||data.fixtures||[])
     allFixtures = items.map(f=>{
       const p=f.participants||[]
@@ -221,11 +229,15 @@ async function loadFixtures() {
         status:f.state?.status||f.status||'',sh:f.scores?.home??null,sa:f.scores?.away??null}
     }).sort((a,b)=>b.date.localeCompare(a.date))
     filteredFixtures=[...allFixtures]
+    showLoading(false)
     renderGames()
-    document.getElementById('filtersSection').style.display='block'
-    document.getElementById('gamesSection').style.display='block'
-    setStatus(`${allFixtures.length} jogos carregados. Clique em um jogo para ver as odds.`,'success')
-  } catch(e) { setStatus(`Erro ao carregar jogos: ${e.message}`,'error') }
+    document.getElementById('filtersSection').style.display = 'block'
+    document.getElementById('gamesSection').style.display = 'block'
+    if (!allFixtures.length) setStatus('Nenhum jogo finalizado encontrado para a Série B.', 'info')
+  } catch(e) {
+    showLoading(false)
+    setStatus(`Erro ao carregar jogos: ${e.message}`, 'error')
+  }
 }
 
 function applyFilters() {
@@ -248,7 +260,7 @@ function clearFilters() {
 
 function renderGames() {
   const grid=document.getElementById('gamesGrid')
-  document.getElementById('gamesCount').textContent=`${filteredFixtures.length} jogo(s)`
+  document.getElementById('gamesCount').textContent=`${filteredFixtures.length} jogo(s) encontrado(s)`
   if (!filteredFixtures.length) {
     grid.innerHTML='<div class="empty"><i class="ti ti-search-off"></i>Nenhum jogo encontrado com esses filtros.</div>'
     return
@@ -346,7 +358,6 @@ function renderChart() {
   const outcomes=Object.entries(markets)
   const oddMin=+document.getElementById('fOddMin').value||null
   const oddMax=+document.getElementById('fOddMax').value||null
-
   const legend=document.getElementById('chartLegend')
   const statsRow=document.getElementById('statsRow')
 
@@ -403,6 +414,9 @@ function renderChart() {
     }
   })
 }
+
+// Iniciar automaticamente
+window.addEventListener('load', init)
 </script>
 </body>
 </html>
