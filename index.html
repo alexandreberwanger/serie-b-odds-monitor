@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brasileirão · Análise de Jogos</title>
+<title>Série B · Odds por Minuto</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -13,552 +13,600 @@
   --bg:#0f1117;--bg2:#181c27;--bg3:#1e2335;--bg4:#252b3d;
   --text:#e8eaf0;--text2:#8b90a8;--text3:#555c78;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --green:#2ecc71;--green-bg:rgba(46,204,113,0.1);
-  --red:#e74c3c;--red-bg:rgba(231,76,60,0.1);
-  --blue:#3498db;--blue-bg:rgba(52,152,219,0.1);
-  --yellow:#f1c40f;--yellow-bg:rgba(241,196,15,0.1);
+  --green:#2ecc71;--red:#e74c3c;--blue:#3498db;--yellow:#f1c40f;--purple:#9b59b6;
   --r:8px;--r-lg:14px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
 /* UPLOAD */
-.upload-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;gap:2rem}
-.upload-logo{font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
-.upload-logo span{color:var(--green)}
-.upload-box{width:100%;max-width:520px;border:1.5px dashed var(--border2);border-radius:var(--r-lg);padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2)}
-.upload-box:hover,.upload-box.drag{border-color:var(--green);background:var(--green-bg)}
-.upload-box i{font-size:40px;color:var(--text3);display:block;margin-bottom:1rem}
-.upload-box h3{font-size:16px;font-weight:500;margin-bottom:6px}
-.upload-box p{font-size:13px;color:var(--text2)}
-.upload-box .hint{font-size:11px;color:var(--text3);margin-top:1rem}
-.upload-btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 20px;background:var(--green);color:#fff;font-weight:600;font-size:13px;border:none;border-radius:var(--r);cursor:pointer;margin-top:1.25rem}
-.upload-btn:hover{opacity:.9}
-.upload-info{max-width:520px;width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.info-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.info-card i{font-size:22px;color:var(--green);margin-bottom:6px;display:block}
-.info-card p{font-size:12px;color:var(--text2);line-height:1.4}
+.upload-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;gap:1.5rem}
+.logo{font-size:26px;font-weight:700;letter-spacing:-0.5px}
+.logo span{color:var(--green)}
+.upload-box{width:100%;max-width:560px;border:1.5px dashed var(--border2);border-radius:var(--r-lg);padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2)}
+.upload-box:hover,.upload-box.drag{border-color:var(--green);background:rgba(46,204,113,.05)}
+.upload-box i{font-size:36px;color:var(--text3);display:block;margin-bottom:12px}
+.upload-box h3{font-size:15px;font-weight:500;margin-bottom:6px}
+.upload-box p{font-size:12px;color:var(--text2);line-height:1.6}
+.upload-btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 20px;background:var(--green);color:#0f1117;font-weight:700;font-size:13px;border:none;border-radius:var(--r);cursor:pointer;margin-top:1rem}
+.demo-btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 16px;background:var(--bg3);color:var(--text2);font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r);cursor:pointer;margin-left:8px}
+.demo-btn:hover{background:var(--bg4);color:var(--text)}
+.schema-box{width:100%;max-width:560px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:1.25rem}
+.schema-box h4{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
+.schema-cols{display:flex;flex-wrap:wrap;gap:6px}
+.col-badge{background:var(--bg3);border:0.5px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:monospace;color:var(--green)}
+.col-badge.required{border-color:rgba(46,204,113,.3)}
 
 /* APP */
-.app{display:none;min-height:100vh}
-.topbar{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.topbar-logo{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.app{display:none;height:100vh;display:none;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-logo{font-size:15px;font-weight:700}
 .topbar-logo span{color:var(--green)}
 .topbar-stats{display:flex;gap:1.5rem}
 .tstat{font-size:12px;color:var(--text2)}
-.tstat strong{color:var(--text);font-weight:600}
-.topbar-right{display:flex;gap:8px;align-items:center}
-.btn{height:34px;padding:0 14px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg3);color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2)}
-.btn.active{background:var(--green-bg);color:var(--green);border-color:rgba(46,204,113,.3)}
+.tstat strong{color:var(--text)}
+.btn{height:32px;padding:0 12px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg3);color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:var(--bg4);color:var(--text)}
 
-.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 56px)}
+.layout{display:grid;grid-template-columns:260px 1fr 400px;flex:1;overflow:hidden;min-height:0}
 
 /* SIDEBAR */
-.sidebar{background:var(--bg2);border-right:0.5px solid var(--border);padding:1.25rem;overflow-y:auto;height:calc(100vh - 56px);position:sticky;top:56px}
-.sidebar-section{margin-bottom:1.5rem}
-.sidebar-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
-.filter-group{margin-bottom:12px}
-.filter-group label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
-.filter-group input,.filter-group select{width:100%;height:34px;padding:0 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--r);background:var(--bg3);color:var(--text);outline:none}
+.sidebar{background:var(--bg2);border-right:0.5px solid var(--border);padding:1rem;overflow-y:auto}
+.sidebar-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:16px}
+.sidebar-title:first-child{margin-top:0}
+.filter-group{margin-bottom:10px}
+.filter-group label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px}
+.filter-group input,.filter-group select{width:100%;height:32px;padding:0 9px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--r);background:var(--bg3);color:var(--text);outline:none}
 .filter-group input:focus,.filter-group select:focus{border-color:var(--green)}
-.filter-group select option{background:var(--bg3)}
 .range-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.clear-btn{width:100%;height:32px;background:var(--red-bg);color:var(--red);border:0.5px solid rgba(231,76,60,.2);border-radius:var(--r);font-size:12px;cursor:pointer;margin-top:4px}
-.clear-btn:hover{opacity:.8}
+.clear-btn{width:100%;height:30px;background:rgba(231,76,60,.1);color:var(--red);border:0.5px solid rgba(231,76,60,.2);border-radius:var(--r);font-size:11px;cursor:pointer;margin-top:6px}
 
-/* MAIN */
-.main{padding:1.25rem;overflow-y:auto}
-.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-.results-count{font-size:13px;color:var(--text2)}
-.results-count strong{color:var(--text)}
-.view-toggle{display:flex;gap:4px}
+/* GAMES LIST */
+.games-col{overflow-y:auto;background:var(--bg);padding:1rem}
+.games-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.games-count{font-size:12px;color:var(--text2)}
+.game-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.game-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.game-card.active{border-color:var(--green);background:rgba(46,204,113,.05)}
+.game-teams{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.team-name{font-size:13px;font-weight:500;max-width:100px}
+.score-box{display:flex;align-items:center;gap:5px}
+.score-n{font-size:20px;font-weight:700}
+.score-x{font-size:12px;color:var(--text3)}
+.game-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+.odds-preview{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px}
+.odds-prev-item{text-align:center;background:var(--bg3);border-radius:4px;padding:4px}
+.odds-prev-lbl{font-size:9px;color:var(--text3);margin-bottom:1px}
+.odds-prev-val{font-size:12px;font-weight:600}
+.badge{display:inline-flex;padding:2px 6px;border-radius:100px;font-size:10px;font-weight:600}
+.b-green{background:rgba(46,204,113,.15);color:var(--green)}
+.b-red{background:rgba(231,76,60,.15);color:var(--red)}
+.b-yellow{background:rgba(241,196,15,.15);color:var(--yellow)}
 
-/* GAMES TABLE */
-.games-table{width:100%;border-collapse:collapse}
-.games-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:0.5px solid var(--border);white-space:nowrap}
-.games-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle}
-.games-table tr{cursor:pointer;transition:background .1s}
-.games-table tr:hover{background:var(--bg3)}
-.games-table tr.selected{background:var(--blue-bg);border-left:2px solid var(--blue)}
-.team-cell{display:flex;align-items:center;gap:8px;min-width:120px}
-.team-badge{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text2);flex-shrink:0}
-.score-cell{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
-.score-num{font-size:16px;font-weight:700;min-width:18px;text-align:center}
-.score-sep{color:var(--text3);font-size:12px}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600}
-.badge-green{background:var(--green-bg);color:var(--green)}
-.badge-red{background:var(--red-bg);color:var(--red)}
-.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
-.badge-blue{background:var(--blue-bg);color:var(--blue)}
-.badge-gray{background:var(--bg4);color:var(--text2)}
-.round-badge{background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:4px;font-size:11px}
-
-/* DETAIL PANEL */
-.detail-panel{position:fixed;right:0;top:56px;width:420px;height:calc(100vh - 56px);background:var(--bg2);border-left:0.5px solid var(--border);overflow-y:auto;transform:translateX(100%);transition:transform .25s;z-index:90}
-.detail-panel.open{transform:translateX(0)}
-.detail-header{padding:1.25rem;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
-.detail-teams{flex:1}
-.detail-match{font-size:18px;font-weight:700;margin-bottom:4px}
-.detail-meta{font-size:12px;color:var(--text2)}
-.close-btn{width:32px;height:32px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.close-btn:hover{background:var(--bg4)}
-.detail-score{padding:1.5rem;text-align:center;border-bottom:0.5px solid var(--border)}
-.detail-score-num{font-size:48px;font-weight:800;letter-spacing:-1px;line-height:1}
-.detail-score-label{font-size:12px;color:var(--text2);margin-top:6px}
-.detail-section{padding:1rem 1.25rem;border-bottom:0.5px solid var(--border)}
-.detail-section h4{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
-.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.stat-label{font-size:12px;color:var(--text2);flex:1;text-align:right}
-.stat-bar-wrap{flex:2;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
-.stat-bar{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
-.stat-bar.away{background:var(--blue)}
-.stat-value{font-size:12px;font-weight:600;flex:1}
-.detail-link{display:flex;align-items:center;justify-content:center;gap:8px;margin:1.25rem;padding:10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2);text-decoration:none;transition:all .15s}
-.detail-link:hover{background:var(--bg4);color:var(--text);border-color:var(--border2)}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 1.25rem 1.25rem}
-.detail-stat{background:var(--bg3);border-radius:var(--r);padding:10px 12px;text-align:center}
-.detail-stat-val{font-size:22px;font-weight:700}
-.detail-stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
-.result-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
-
-/* EMPTY */
-.empty{text-align:center;padding:5rem 2rem;color:var(--text3)}
-.empty i{font-size:40px;display:block;margin-bottom:1rem}
-.empty p{font-size:14px}
-
-/* PAGINATION */
-.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:1.5rem;margin-top:auto}
-.page-btn{width:34px;height:34px;border:0.5px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
-.page-btn:hover{background:var(--bg3);color:var(--text)}
-.page-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
-.page-info{font-size:12px;color:var(--text2);padding:0 8px}
-
-/* RESPONSIVE */
-@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.detail-panel{width:100%}}
+/* DETAIL */
+.detail-col{background:var(--bg2);border-left:0.5px solid var(--border);overflow-y:auto;padding:1.25rem}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);text-align:center}
+.detail-empty i{font-size:36px;margin-bottom:10px}
+.detail-empty p{font-size:13px}
+.detail-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.detail-sub{font-size:12px;color:var(--text2);margin-bottom:1rem}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.tab{height:28px;padding:0 12px;font-size:12px;border:0.5px solid var(--border);border-radius:100px;cursor:pointer;color:var(--text2);background:var(--bg3)}
+.tab.active{background:rgba(46,204,113,.15);color:var(--green);border-color:rgba(46,204,113,.3)}
+.chart-wrap{position:relative;width:100%;height:240px;margin-bottom:1rem}
+.chart-legend{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem}
+.stat-box{background:var(--bg3);border-radius:var(--r);padding:10px;text-align:center}
+.stat-val{font-size:18px;font-weight:700}
+.stat-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+.events-list{display:flex;flex-direction:column;gap:6px}
+.event-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--r);font-size:12px}
+.event-min{font-size:11px;font-weight:700;color:var(--green);min-width:28px}
+.event-desc{flex:1}
+.trend-box{background:var(--bg3);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.trend-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.trend-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:12px}
+.trend-up{color:var(--green)}
+.trend-down{color:var(--red)}
+.section-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin:1rem 0 8px}
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px}
 </style>
 </head>
 <body>
 
-<!-- UPLOAD SCREEN -->
 <div class="upload-screen" id="uploadScreen">
-  <div class="upload-logo">Brasileirão <span>Analytics</span></div>
+  <div class="logo">Odds<span>Monitor</span> · Série B</div>
 
   <div class="upload-box" id="dropZone" onclick="document.getElementById('csvFile').click()">
-    <i class="ti ti-file-type-csv"></i>
-    <h3>Importe o dataset do Kaggle</h3>
-    <p>Arraste o arquivo CSV aqui ou clique para selecionar</p>
-    <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('csvFile').click()">
-      <i class="ti ti-upload"></i> Selecionar arquivo
-    </button>
-    <p class="hint">kaggle.com/datasets/ricardomattos05/jogos-do-campeonato-brasileiro</p>
+    <i class="ti ti-chart-line"></i>
+    <h3>Importe o dataset de odds por minuto</h3>
+    <p>Arraste o CSV aqui ou clique para selecionar<br>
+    Colunas esperadas: <strong>jogo_id, mandante, visitante, minuto, odd_mandante, odd_empate, odd_visitante</strong></p>
+    <div style="margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:0">
+      <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('csvFile').click()">
+        <i class="ti ti-upload"></i> Selecionar CSV
+      </button>
+      <button class="demo-btn" onclick="event.stopPropagation();loadDemo()">
+        <i class="ti ti-flask"></i> Usar dados demo
+      </button>
+    </div>
   </div>
   <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(event)">
 
-  <div class="upload-info">
-    <div class="info-card"><i class="ti ti-filter"></i><p>Filtros por rodada, time, ano e competição</p></div>
-    <div class="info-card"><i class="ti ti-chart-bar"></i><p>Estatísticas detalhadas por jogo</p></div>
-    <div class="info-card"><i class="ti ti-external-link"></i><p>Link direto para o Flashscore de cada jogo</p></div>
+  <div class="schema-box">
+    <h4>Colunas suportadas no CSV</h4>
+    <div class="schema-cols">
+      <span class="col-badge required">jogo_id</span>
+      <span class="col-badge required">mandante</span>
+      <span class="col-badge required">visitante</span>
+      <span class="col-badge required">minuto</span>
+      <span class="col-badge required">odd_mandante</span>
+      <span class="col-badge required">odd_empate</span>
+      <span class="col-badge required">odd_visitante</span>
+      <span class="col-badge">data</span>
+      <span class="col-badge">placar_mandante</span>
+      <span class="col-badge">placar_visitante</span>
+      <span class="col-badge">gol_no_minuto</span>
+      <span class="col-badge">quem_marcou</span>
+      <span class="col-badge">competicao</span>
+      <span class="col-badge">temporada</span>
+    </div>
   </div>
 </div>
 
-<!-- APP -->
 <div class="app" id="appScreen">
   <div class="topbar">
-    <div class="topbar-logo">Brasileirão <span>Analytics</span></div>
+    <div class="topbar-logo">Odds<span>Monitor</span> · Série B</div>
     <div class="topbar-stats">
-      <span class="tstat">Jogos: <strong id="totalJogos">0</strong></span>
-      <span class="tstat">Times: <strong id="totalTimes">0</strong></span>
-      <span class="tstat">Temporadas: <strong id="totalAnos">0</strong></span>
+      <span class="tstat">Jogos: <strong id="tJogos">0</strong></span>
+      <span class="tstat">Minutos: <strong id="tMinutos">0</strong></span>
     </div>
-    <div class="topbar-right">
+    <div style="display:flex;gap:6px">
       <button class="btn" onclick="resetApp()"><i class="ti ti-upload"></i> Trocar CSV</button>
     </div>
   </div>
 
   <div class="layout">
+    <!-- SIDEBAR FILTROS -->
     <div class="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-title">Filtros</div>
+      <div class="sidebar-title">Filtros</div>
+      <div class="filter-group">
+        <label>Buscar time</label>
+        <input type="text" id="fTime" placeholder="Ex: Ceará" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Competição</label>
+        <select id="fComp" onchange="applyFilters()"><option value="">Todas</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Temporada</label>
+        <select id="fTemp" onchange="applyFilters()"><option value="">Todas</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Resultado</label>
+        <select id="fResult" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="home">Vitória Mandante</option>
+          <option value="away">Vitória Visitante</option>
+          <option value="draw">Empate</option>
+        </select>
+      </div>
 
-        <div class="filter-group">
-          <label>Buscar time</label>
-          <input type="text" id="fTime" placeholder="Ex: Ceará, Santos..." oninput="applyFilters()">
-        </div>
+      <div class="sidebar-title">Análise de Odds</div>
+      <div class="filter-group">
+        <label>Odd mín (final)</label>
+        <input type="number" id="fOddMin" step="0.1" min="1" placeholder="1.00" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Odd máx (final)</label>
+        <input type="number" id="fOddMax" step="0.1" placeholder="99.00" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Queda mín de odd (%)</label>
+        <input type="number" id="fDrop" step="1" min="0" placeholder="Ex: 30" oninput="applyFilters()">
+        <small style="font-size:10px;color:var(--text3)">Jogos onde mandante caiu X% ou mais</small>
+      </div>
+      <button class="clear-btn" onclick="clearFilters()"><i class="ti ti-x"></i> Limpar filtros</button>
+    </div>
 
-        <div class="filter-group">
-          <label>Competição</label>
-          <select id="fComp" onchange="applyFilters()">
-            <option value="">Todas</option>
-          </select>
-        </div>
+    <!-- LISTA DE JOGOS -->
+    <div class="games-col">
+      <div class="games-header">
+        <span class="games-count"><strong id="gCount">0</strong> jogos</span>
+      </div>
+      <div id="gamesList"></div>
+    </div>
 
-        <div class="filter-group">
-          <label>Ano</label>
-          <select id="fAno" onchange="applyFilters()">
-            <option value="">Todos</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label>Rodada</label>
-          <div class="range-row">
-            <input type="number" id="fRodMin" placeholder="De" min="1" oninput="applyFilters()">
-            <input type="number" id="fRodMax" placeholder="Até" min="1" oninput="applyFilters()">
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <label>Resultado</label>
-          <select id="fResult" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option value="mandante">Vitória Mandante</option>
-            <option value="visitante">Vitória Visitante</option>
-            <option value="empate">Empate</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label>Data de</label>
-          <input type="date" id="fDataDe" oninput="applyFilters()">
-        </div>
-        <div class="filter-group">
-          <label>Data até</label>
-          <input type="date" id="fDataAte" oninput="applyFilters()">
-        </div>
-
-        <button class="clear-btn" onclick="clearFilters()"><i class="ti ti-x"></i> Limpar filtros</button>
+    <!-- DETALHE -->
+    <div class="detail-col" id="detailCol">
+      <div class="detail-empty">
+        <i class="ti ti-hand-click"></i>
+        <p>Clique em um jogo<br>para ver a análise de odds</p>
       </div>
     </div>
-
-    <div class="main" id="mainContent">
-      <div class="results-header">
-        <div class="results-count"><strong id="filteredCount">0</strong> jogos encontrados</div>
-      </div>
-      <div id="gamesContainer"></div>
-      <div class="pagination" id="paginationEl"></div>
-    </div>
-  </div>
-
-  <div class="detail-panel" id="detailPanel">
-    <div class="detail-header">
-      <div class="detail-teams">
-        <div class="detail-match" id="dpMatch"></div>
-        <div class="detail-meta" id="dpMeta"></div>
-      </div>
-      <div class="close-btn" onclick="closeDetail()"><i class="ti ti-x"></i></div>
-    </div>
-    <div class="detail-score">
-      <div class="detail-score-num" id="dpScore"></div>
-      <div class="detail-score-label" id="dpResult"></div>
-    </div>
-    <div class="detail-grid" id="dpGrid"></div>
-    <div class="detail-section" id="dpStats"></div>
-    <a class="detail-link" id="dpFlashlink" href="#" target="_blank">
-      <i class="ti ti-external-link"></i> Ver no Flashscore
-    </a>
-    <a class="detail-link" id="dpOddslink" href="#" target="_blank" style="margin-top:-8px">
-      <i class="ti ti-chart-line"></i> Ver odds no OddsPortal
-    </a>
   </div>
 </div>
 
 <script>
-let allGames = [], filtered = [], currentPage = 1
-const PER_PAGE = 50
+let allGames = {}, allRows = [], filteredIds = [], selId = null
+let chartInst = null, activeTab = 'odds'
 
-// Drag & drop
+// Drag drop
 const dz = document.getElementById('dropZone')
 dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag')})
 dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'))
-dz.addEventListener('drop', e=>{
-  e.preventDefault();dz.classList.remove('drag')
-  const f = e.dataTransfer.files[0]
-  if(f) parseFile(f)
-})
+dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('drag');parseFile(e.dataTransfer.files[0])})
 
-function loadCSV(e) { parseFile(e.target.files[0]) }
+function loadCSV(e){ parseFile(e.target.files[0]) }
 
-function parseFile(file) {
-  Papa.parse(file, {
-    header: true, skipEmptyLines: true, encoding: 'UTF-8',
-    complete: r => {
-      allGames = r.data.map((row,i) => normalizeRow(row, i))
-        .filter(g => g.mandante && g.visitante)
-      initApp()
-    },
-    error: () => alert('Erro ao ler o CSV. Verifique o arquivo.')
+function parseFile(file){
+  Papa.parse(file,{header:true,skipEmptyLines:true,dynamicTyping:true,
+    complete: r=>{ processData(r.data) },
+    error:()=>alert('Erro ao ler CSV')
   })
 }
 
-function normalizeRow(row, idx) {
-  // Normaliza diferentes formatos de CSV do Brasileirão
-  const keys = Object.keys(row)
-  const get = (...names) => {
-    for(const n of names) {
-      const k = keys.find(k=>k.toLowerCase().trim()===n.toLowerCase())
-      if(k && row[k] && row[k].trim()) return row[k].trim()
-    }
-    return ''
-  }
-
-  const mandantePlacar = parseInt(get('mandante placar','gols_mandante','home_score','placar_mandante','home','score_home')) 
-  const visitantePlacar = parseInt(get('visitante placar','gols_visitante','away_score','placar_visitante','away','score_away'))
-  
-  let resultado = get('vencedor','resultado','winner')
-  if (!resultado || resultado === '-') {
-    if (!isNaN(mandantePlacar) && !isNaN(visitantePlacar)) {
-      resultado = mandantePlacar > visitantePlacar ? get('mandante','home_team','time_mandante') || 'mandante'
-        : visitantePlacar > mandantePlacar ? get('visitante','away_team','time_visitante') || 'visitante'
-        : '-'
-    }
-  }
-
-  const dataStr = get('data','date','data_partida')
-  let dataISO = ''
-  if (dataStr) {
-    const p = dataStr.split(/[\/\-]/)
-    if (p.length === 3) {
-      if (p[2].length === 4) dataISO = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`
-      else dataISO = dataStr
-    }
-  }
-
-  const ano = dataISO ? dataISO.slice(0,4) : get('ano','year','season','temporada')
-
-  return {
-    idx,
-    rodada: get('rodada','round','jornada','matchday'),
-    data: dataISO,
-    horario: get('horário','horario','time','hora','hora_partida'),
-    dia: get('dia','day'),
-    mandante: get('mandante','home_team','time_mandante','home','club_home'),
-    visitante: get('visitante','away_team','time_visitante','away','club_away'),
-    mandantePlacar: isNaN(mandantePlacar) ? null : mandantePlacar,
-    visitantePlacar: isNaN(visitantePlacar) ? null : visitantePlacar,
-    vencedor: resultado,
-    arena: get('arena','stadium','estádio','estadio'),
-    estadoMandante: get('estado mandante','estado_mandante','home_state'),
-    estadoVisitante: get('estado visitante','estado_visitante','away_state'),
-    competicao: get('competição','competicao','competition','league','campeonato'),
-    ano: ano
-  }
+async function loadDemo(){
+  const r = await fetch('serie_b_odds_simulado.csv')
+  const text = await r.text()
+  const res = Papa.parse(text,{header:true,skipEmptyLines:true,dynamicTyping:true})
+  processData(res.data)
 }
 
-function initApp() {
-  document.getElementById('uploadScreen').style.display = 'none'
-  document.getElementById('appScreen').style.display = 'block'
+function processData(rows){
+  allRows = rows
+  allGames = {}
 
-  // Stats do topbar
-  document.getElementById('totalJogos').textContent = allGames.length.toLocaleString('pt-BR')
-  const times = new Set([...allGames.map(g=>g.mandante),...allGames.map(g=>g.visitante)])
-  document.getElementById('totalTimes').textContent = times.size
-  const anos = [...new Set(allGames.map(g=>g.ano).filter(Boolean))].sort()
-  document.getElementById('totalAnos').textContent = anos.length
+  rows.forEach(r=>{
+    const id = r.jogo_id ?? r.id ?? `${r.mandante}_${r.visitante}_${r.data}`
+    if(!allGames[id]){
+      allGames[id] = {
+        id, mandante: r.mandante, visitante: r.visitante,
+        data: r.data||'', competicao: r.competicao||'', temporada: r.temporada||'',
+        minutos:[]
+      }
+    }
+    allGames[id].minutos.push(r)
+  })
 
-  // Preencher selects
-  const comps = [...new Set(allGames.map(g=>g.competicao).filter(Boolean))].sort()
-  const selComp = document.getElementById('fComp')
-  comps.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;selComp.appendChild(o)})
+  // Calcular stats de cada jogo
+  Object.values(allGames).forEach(g=>{
+    g.minutos.sort((a,b)=>a.minuto-b.minuto)
+    const first = g.minutos[0], last = g.minutos[g.minutos.length-1]
+    g.placar_h = last.placar_mandante??null
+    g.placar_a = last.placar_visitante??null
+    g.odd_h_ini = first.odd_mandante
+    g.odd_h_fim = last.odd_mandante
+    g.odd_d_ini = first.odd_empate
+    g.odd_d_fim = last.odd_empate
+    g.odd_a_ini = first.odd_visitante
+    g.odd_a_fim = last.odd_visitante
+    g.variacao_h = g.odd_h_ini ? Math.round((g.odd_h_fim/g.odd_h_ini-1)*100) : 0
+    g.gols = g.minutos.filter(m=>m.gol_no_minuto==1||m.gol_no_minuto==true)
+    if(g.placar_h!=null && g.placar_a!=null){
+      if(g.placar_h>g.placar_a) g.resultado='home'
+      else if(g.placar_a>g.placar_h) g.resultado='away'
+      else g.resultado='draw'
+    }
+    const maxDrop = g.minutos.reduce((acc,m,i)=>{
+      if(i===0) return acc
+      const prev = g.minutos[i-1]
+      const drop = (prev.odd_mandante - m.odd_mandante)/prev.odd_mandante*100
+      return drop>acc?drop:acc
+    },0)
+    g.max_drop_h = Math.round(maxDrop)
+  })
 
-  const selAno = document.getElementById('fAno')
-  anos.reverse().forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;selAno.appendChild(o)})
+  initApp()
+}
 
-  filtered = [...allGames]
-  currentPage = 1
+function initApp(){
+  document.getElementById('uploadScreen').style.display='none'
+  const app = document.getElementById('appScreen')
+  app.style.display='flex'
+
+  const ids = Object.keys(allGames)
+  document.getElementById('tJogos').textContent = ids.length
+  document.getElementById('tMinutos').textContent = allRows.length.toLocaleString('pt-BR')
+
+  const comps=[...new Set(Object.values(allGames).map(g=>g.competicao).filter(Boolean))].sort()
+  const temps=[...new Set(Object.values(allGames).map(g=>g.temporada).filter(Boolean))].sort().reverse()
+  const sc=document.getElementById('fComp'), st=document.getElementById('fTemp')
+  comps.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sc.appendChild(o)})
+  temps.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;st.appendChild(o)})
+
+  filteredIds=[...ids]
   renderGames()
 }
 
-function applyFilters() {
-  const time = document.getElementById('fTime').value.trim().toLowerCase()
-  const comp = document.getElementById('fComp').value
-  const ano = document.getElementById('fAno').value
-  const rodMin = parseInt(document.getElementById('fRodMin').value)
-  const rodMax = parseInt(document.getElementById('fRodMax').value)
-  const result = document.getElementById('fResult').value
-  const dataDe = document.getElementById('fDataDe').value
-  const dataAte = document.getElementById('fDataAte').value
+function applyFilters(){
+  const time=document.getElementById('fTime').value.toLowerCase()
+  const comp=document.getElementById('fComp').value
+  const temp=document.getElementById('fTemp').value
+  const result=document.getElementById('fResult').value
+  const oddMin=parseFloat(document.getElementById('fOddMin').value)||null
+  const oddMax=parseFloat(document.getElementById('fOddMax').value)||null
+  const drop=parseFloat(document.getElementById('fDrop').value)||null
 
-  filtered = allGames.filter(g => {
-    if (time && !g.mandante.toLowerCase().includes(time) && !g.visitante.toLowerCase().includes(time)) return false
-    if (comp && g.competicao !== comp) return false
-    if (ano && g.ano !== ano) return false
-    if (!isNaN(rodMin) && parseInt(g.rodada) < rodMin) return false
-    if (!isNaN(rodMax) && parseInt(g.rodada) > rodMax) return false
-    if (dataDe && g.data < dataDe) return false
-    if (dataAte && g.data > dataAte) return false
-    if (result === 'mandante' && g.mandantePlacar <= g.visitantePlacar) return false
-    if (result === 'visitante' && g.visitantePlacar <= g.mandantePlacar) return false
-    if (result === 'empate' && g.mandantePlacar !== g.visitantePlacar) return false
+  filteredIds=Object.keys(allGames).filter(id=>{
+    const g=allGames[id]
+    if(time&&!g.mandante.toLowerCase().includes(time)&&!g.visitante.toLowerCase().includes(time)) return false
+    if(comp&&g.competicao!==comp) return false
+    if(temp&&g.temporada!==temp) return false
+    if(result&&g.resultado!==result) return false
+    if(oddMin&&g.odd_h_fim<oddMin) return false
+    if(oddMax&&g.odd_h_fim>oddMax) return false
+    if(drop&&g.max_drop_h<drop) return false
     return true
   })
-
-  currentPage = 1
   renderGames()
 }
 
-function clearFilters() {
-  ['fTime','fRodMin','fRodMax','fDataDe','fDataAte'].forEach(id=>document.getElementById(id).value='')
+function clearFilters(){
+  ['fTime','fOddMin','fOddMax','fDrop'].forEach(id=>document.getElementById(id).value='')
   document.getElementById('fComp').value=''
-  document.getElementById('fAno').value=''
+  document.getElementById('fTemp').value=''
   document.getElementById('fResult').value=''
-  filtered=[...allGames]; currentPage=1; renderGames()
+  filteredIds=Object.keys(allGames)
+  renderGames()
 }
 
-function renderGames() {
-  const start = (currentPage-1)*PER_PAGE
-  const page = filtered.slice(start, start+PER_PAGE)
-  document.getElementById('filteredCount').textContent = filtered.length.toLocaleString('pt-BR')
-
-  if (!filtered.length) {
-    document.getElementById('gamesContainer').innerHTML = `
-      <div class="empty"><i class="ti ti-search-off"></i><p>Nenhum jogo encontrado com esses filtros.</p></div>`
-    document.getElementById('paginationEl').innerHTML = ''
+function renderGames(){
+  document.getElementById('gCount').textContent=filteredIds.length
+  if(!filteredIds.length){
+    document.getElementById('gamesList').innerHTML='<div class="empty">Nenhum jogo encontrado</div>'
     return
   }
+  document.getElementById('gamesList').innerHTML=filteredIds.map(id=>{
+    const g=allGames[id]
+    const active=selId===id?' active':''
+    const varCls=g.variacao_h<-10?'trend-down':g.variacao_h>10?'trend-up':''
+    const varIcon=g.variacao_h<0?'↓':'↑'
+    const dataBR=g.data?new Date(g.data+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—'
+    let resBadge=''
+    if(g.resultado==='home') resBadge='<span class="badge b-green">M</span>'
+    else if(g.resultado==='away') resBadge='<span class="badge b-red">V</span>'
+    else if(g.resultado==='draw') resBadge='<span class="badge b-yellow">E</span>'
 
-  const tbody = page.map(g => {
-    const hasScore = g.mandantePlacar !== null && g.visitantePlacar !== null
-    let resultBadge = ''
-    if (hasScore) {
-      if (g.mandantePlacar > g.visitantePlacar) resultBadge = `<span class="badge badge-green">M</span>`
-      else if (g.visitantePlacar > g.mandantePlacar) resultBadge = `<span class="badge badge-blue">V</span>`
-      else resultBadge = `<span class="badge badge-yellow">E</span>`
-    }
-
-    const dataBR = g.data ? new Date(g.data+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—'
-    const mandInitial = g.mandante.slice(0,3).toUpperCase()
-    const visInitial = g.visitante.slice(0,3).toUpperCase()
-
-    return `<tr onclick="showDetail(${g.idx})" id="row-${g.idx}">
-      <td><span class="round-badge">${g.rodada||'—'}</span></td>
-      <td>
-        <div class="team-cell">
-          <div class="team-badge">${mandInitial}</div>
-          ${g.mandante}
+    return `<div class="game-card${active}" onclick="selectGame('${id}')">
+      <div class="game-teams">
+        <span class="team-name">${g.mandante}</span>
+        <div class="score-box">
+          <span class="score-n">${g.placar_h??'?'}</span>
+          <span class="score-x">×</span>
+          <span class="score-n">${g.placar_a??'?'}</span>
         </div>
-      </td>
-      <td>
-        <div class="score-cell">
-          <span class="score-num">${hasScore?g.mandantePlacar:'?'}</span>
-          <span class="score-sep">×</span>
-          <span class="score-num">${hasScore?g.visitantePlacar:'?'}</span>
-        </div>
-      </td>
-      <td>
-        <div class="team-cell">
-          <div class="team-badge">${visInitial}</div>
-          ${g.visitante}
-        </div>
-      </td>
-      <td>${resultBadge}</td>
-      <td style="color:var(--text3);font-size:12px">${dataBR}</td>
-      <td style="color:var(--text3);font-size:12px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.arena||'—'}</td>
-    </tr>`
+        <span class="team-name" style="text-align:right">${g.visitante}</span>
+      </div>
+      <div class="game-meta">
+        <span>${dataBR} ${g.competicao?'· '+g.competicao:''}</span>
+        <span style="display:flex;align-items:center;gap:4px">
+          ${resBadge}
+          <span class="${varCls}" style="font-size:11px">${varIcon}${Math.abs(g.variacao_h)}%</span>
+        </span>
+      </div>
+      <div class="odds-preview">
+        <div class="odds-prev-item"><div class="odds-prev-lbl">Casa ini→fim</div><div class="odds-prev-val" style="font-size:11px">${g.odd_h_ini}→${g.odd_h_fim}</div></div>
+        <div class="odds-prev-item"><div class="odds-prev-lbl">Empate</div><div class="odds-prev-val">${g.odd_d_fim}</div></div>
+        <div class="odds-prev-item"><div class="odds-prev-lbl">Fora</div><div class="odds-prev-val">${g.odd_a_fim}</div></div>
+      </div>
+    </div>`
   }).join('')
-
-  document.getElementById('gamesContainer').innerHTML = `
-    <table class="games-table">
-      <thead>
-        <tr>
-          <th>Rod.</th><th>Mandante</th><th style="text-align:center">Placar</th>
-          <th>Visitante</th><th>Res.</th><th>Data</th><th>Arena</th>
-        </tr>
-      </thead>
-      <tbody>${tbody}</tbody>
-    </table>`
-
-  renderPagination()
 }
 
-function renderPagination() {
-  const total = Math.ceil(filtered.length/PER_PAGE)
-  if (total <= 1) { document.getElementById('paginationEl').innerHTML=''; return }
-
-  let html = ''
-  if (currentPage > 1) html += `<div class="page-btn" onclick="goPage(${currentPage-1})"><i class="ti ti-chevron-left"></i></div>`
-
-  const start = Math.max(1, currentPage-2), end = Math.min(total, currentPage+2)
-  if (start > 1) html += `<div class="page-btn" onclick="goPage(1)">1</div>${start>2?'<div class="page-info">…</div>':''}`
-  for(let p=start;p<=end;p++) html += `<div class="page-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</div>`
-  if (end < total) html += `${end<total-1?'<div class="page-info">…</div>':''}<div class="page-btn" onclick="goPage(${total})">${total}</div>`
-  if (currentPage < total) html += `<div class="page-btn" onclick="goPage(${currentPage+1})"><i class="ti ti-chevron-right"></i></div>`
-
-  document.getElementById('paginationEl').innerHTML = `<div class="page-info">${filtered.length} jogos · pág. ${currentPage}/${total}</div>${html}`
+function selectGame(id){
+  selId=id
+  renderGames()
+  activeTab='odds'
+  renderDetail()
 }
 
-function goPage(p) { currentPage=p; renderGames(); document.getElementById('mainContent').scrollTop=0 }
+function setTab(t){
+  activeTab=t
+  renderDetail()
+}
 
-function showDetail(idx) {
-  const g = allGames.find(x=>x.idx===idx)
-  if (!g) return
+function renderDetail(){
+  if(!selId) return
+  const g=allGames[selId]
+  const tabs=['odds','eventos','tendencias']
+  const tabLabels={odds:'📈 Odds',eventos:'⚽ Eventos',tendencias:'📊 Análise'}
 
-  document.querySelectorAll('.games-table tr').forEach(r=>r.classList.remove('selected'))
-  const row = document.getElementById(`row-${idx}`)
-  if (row) row.classList.add('selected')
+  const tabsHtml=tabs.map(t=>`<div class="tab${activeTab===t?' active':''}" onclick="setTab('${t}')">${tabLabels[t]}</div>`).join('')
 
-  document.getElementById('dpMatch').textContent = `${g.mandante} × ${g.visitante}`
-  const dataBR = g.data ? new Date(g.data+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : ''
-  document.getElementById('dpMeta').textContent = [g.competicao,`Rodada ${g.rodada}`,dataBR,g.horario,g.arena].filter(Boolean).join(' · ')
+  let content=''
+  if(activeTab==='odds') content=renderOddsTab(g)
+  else if(activeTab==='eventos') content=renderEventosTab(g)
+  else content=renderTendenciasTab(g)
 
-  const hasScore = g.mandantePlacar !== null && g.visitantePlacar !== null
-  document.getElementById('dpScore').textContent = hasScore ? `${g.mandantePlacar} – ${g.visitantePlacar}` : '? – ?'
+  const dataBR=g.data?new Date(g.data+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}):''
 
-  let resultTxt = '', resultColor = ''
-  if (hasScore) {
-    if (g.mandantePlacar > g.visitantePlacar) { resultTxt=`Vitória do ${g.mandante}`; resultColor='var(--green)' }
-    else if (g.visitantePlacar > g.mandantePlacar) { resultTxt=`Vitória do ${g.visitante}`; resultColor='var(--blue)' }
-    else { resultTxt='Empate'; resultColor='var(--yellow)' }
+  document.getElementById('detailCol').innerHTML=`
+    <div class="detail-title">${g.mandante} × ${g.visitante}</div>
+    <div class="detail-sub">${[dataBR,g.competicao,g.temporada].filter(Boolean).join(' · ')}</div>
+    <div class="tabs">${tabsHtml}</div>
+    ${content}
+  `
+
+  if(activeTab==='odds') renderChart(g)
+}
+
+function renderOddsTab(g){
+  const dh=g.variacao_h, dd=Math.round((g.odd_d_fim/g.odd_d_ini-1)*100), da=Math.round((g.odd_a_fim/g.odd_a_ini-1)*100)
+  const varColor=(v)=>v<0?'var(--green)':v>0?'var(--red)':'var(--text2)'
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" style="color:var(--green)">${g.odd_h_fim}</div><div class="stat-lbl">Odd Casa Final</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--yellow)">${g.odd_d_fim}</div><div class="stat-lbl">Empate Final</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--blue)">${g.odd_a_fim}</div><div class="stat-lbl">Odd Fora Final</div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" style="color:${varColor(dh)}">${dh>0?'+':''}${dh}%</div><div class="stat-lbl">Variação Casa</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${varColor(dd)}">${dd>0?'+':''}${dd}%</div><div class="stat-lbl">Variação Empate</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${varColor(da)}">${da>0?'+':''}${da}%</div><div class="stat-lbl">Variação Fora</div></div>
+    </div>
+    <div class="chart-legend">
+      <span class="leg-item"><span class="leg-sq" style="background:#2ecc71"></span>${g.mandante}</span>
+      <span class="leg-item"><span class="leg-sq" style="background:#f1c40f"></span>Empate</span>
+      <span class="leg-item"><span class="leg-sq" style="background:#3498db"></span>${g.visitante}</span>
+    </div>
+    <div class="chart-wrap"><canvas id="oddsChart" role="img" aria-label="Evolução das odds ao longo do jogo"></canvas></div>
+  `
+}
+
+function renderChart(g){
+  requestAnimationFrame(()=>{
+    const canvas=document.getElementById('oddsChart')
+    if(!canvas) return
+    if(chartInst){chartInst.destroy();chartInst=null}
+
+    // Filtrar intervalo de minutos
+    const mins=g.minutos.map(m=>m.minuto)
+    const labels=mins.map(m=>`${m}'`)
+
+    // Marcar gols
+    const golAnnotations=g.gols.map(m=>m.minuto)
+
+    chartInst=new Chart(canvas,{
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          {label:g.mandante,data:g.minutos.map(m=>m.odd_mandante),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,.1)',tension:.3,pointRadius:2,pointHoverRadius:5,fill:false,borderWidth:2},
+          {label:'Empate',data:g.minutos.map(m=>m.odd_empate),borderColor:'#f1c40f',backgroundColor:'rgba(241,196,15,.05)',tension:.3,pointRadius:2,pointHoverRadius:5,fill:false,borderWidth:1.5,borderDash:[4,2]},
+          {label:g.visitante,data:g.minutos.map(m=>m.odd_visitante),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,.1)',tension:.3,pointRadius:2,pointHoverRadius:5,fill:false,borderWidth:2},
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        scales:{
+          x:{ticks:{font:{size:10},maxRotation:45,callback:(v,i)=>i%10===0?labels[i]:''},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{ticks:{font:{size:10},callback:v=>v.toFixed(2)},grid:{color:'rgba(255,255,255,0.04)'}}
+        },
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`}}
+        }
+      }
+    })
+
+    // Desenhar linhas verticais nos gols
+    const plugin={
+      id:'golLines',
+      afterDraw(chart){
+        const ctx=chart.ctx, xAxis=chart.scales.x
+        golAnnotations.forEach(min=>{
+          const idx=mins.indexOf(min)
+          if(idx<0) return
+          const x=xAxis.getPixelForTick(idx)
+          ctx.save()
+          ctx.setLineDash([4,3])
+          ctx.strokeStyle='rgba(231,76,60,.6)'
+          ctx.lineWidth=1.5
+          ctx.beginPath()
+          ctx.moveTo(x,chart.chartArea.top)
+          ctx.lineTo(x,chart.chartArea.bottom)
+          ctx.stroke()
+          ctx.restore()
+        })
+      }
+    }
+    chartInst.options.plugins.golLines={}
+    Chart.register(plugin)
+    chartInst.update()
+  })
+}
+
+function renderEventosTab(g){
+  if(!g.gols.length) return '<div class="empty" style="padding:2rem">Nenhum gol registrado neste jogo</div>'
+  return `
+    <div class="section-title">Gols registrados</div>
+    <div class="events-list">
+      ${g.gols.map(m=>`
+        <div class="event-item">
+          <span class="event-min">${m.minuto}'</span>
+          <span class="event-desc">⚽ ${m.quem_marcou||'Gol'} — ${m.mandante} ${m.placar_mandante??'?'}×${m.placar_visitante??'?'} ${m.visitante}</span>
+          <span style="font-size:11px;color:var(--text3)">${m.odd_mandante??'—'}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="section-title" style="margin-top:1rem">Impacto nas odds</div>
+    <div class="events-list">
+      ${g.gols.map((m,i)=>{
+        const prev=g.minutos.find(x=>x.minuto===m.minuto-1)
+        if(!prev) return ''
+        const delta=((m.odd_mandante-prev.odd_mandante)/prev.odd_mandante*100).toFixed(1)
+        const cls=parseFloat(delta)<0?'trend-up':'trend-down'
+        return `<div class="event-item">
+          <span class="event-min">${m.minuto}'</span>
+          <span class="event-desc">Odd Casa: ${prev.odd_mandante} → ${m.odd_mandante}</span>
+          <span class="${cls}" style="font-size:12px;font-weight:600">${parseFloat(delta)>0?'+':''}${delta}%</span>
+        </div>`
+      }).join('')}
+    </div>
+  `
+}
+
+function renderTendenciasTab(g){
+  const maxOddH=Math.max(...g.minutos.map(m=>m.odd_mandante))
+  const minOddH=Math.min(...g.minutos.map(m=>m.odd_mandante))
+  const minMinuto=g.minutos.find(m=>m.odd_mandante===minOddH)
+  const maxMinuto=g.minutos.find(m=>m.odd_mandante===maxOddH)
+
+  // Calcular maior queda em 5 min
+  let maiorQueda={delta:0,minuto:0,de:0,para:0}
+  for(let i=5;i<g.minutos.length;i++){
+    const atual=g.minutos[i], antes=g.minutos[i-5]
+    const delta=((atual.odd_mandante-antes.odd_mandante)/antes.odd_mandante*100)
+    if(delta<maiorQueda.delta) maiorQueda={delta,minuto:atual.minuto,de:antes.odd_mandante,para:atual.odd_mandante}
   }
-  const dpRes = document.getElementById('dpResult')
-  dpRes.textContent = resultTxt
-  dpRes.style.color = resultColor
 
-  document.getElementById('dpGrid').innerHTML = [
-    ['Rodada', g.rodada||'—'],
-    ['Data', g.data?new Date(g.data+'T12:00:00').toLocaleDateString('pt-BR'):'—'],
-    ['Horário', g.horario||'—'],
-    ['Estado Casa', g.estadoMandante||'—'],
-    ['Estado Fora', g.estadoVisitante||'—'],
-    ['Arena', g.arena||'—'],
-  ].map(([l,v])=>`<div class="detail-stat"><div class="detail-stat-val" style="font-size:15px">${v}</div><div class="detail-stat-lbl">${l}</div></div>`).join('')
+  // 1T vs 2T
+  const primeiro=g.minutos.filter(m=>m.minuto<=45)
+  const segundo=g.minutos.filter(m=>m.minuto>45)
+  const vol1=primeiro.length>1?Math.abs(primeiro[primeiro.length-1].odd_mandante-primeiro[0].odd_mandante).toFixed(2):0
+  const vol2=segundo.length>1?Math.abs(segundo[segundo.length-1].odd_mandante-segundo[0].odd_mandante).toFixed(2):0
 
-  // Link Flashscore
-  const fsQuery = encodeURIComponent(`${g.mandante} ${g.visitante} ${g.ano||''} site:flashscore.com.br`)
-  const fsBase = `https://www.flashscore.com.br/futebol/brasil/`
-  const comp = g.competicao||''
-  let fsSlug = 'brasileirao-betano'
-  if (/série b|serie b/i.test(comp)) fsSlug='brasileirao-serie-b'
-  else if (/copa.*brasil/i.test(comp)) fsSlug='copa-betano-do-brasil'
-  document.getElementById('dpFlashlink').href = `https://www.flashscore.com.br/futebol/brasil/${fsSlug}/resultados/`
+  return `
+    <div class="section-title">Extremos da odd mandante</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" style="color:var(--red)">${maxOddH}</div><div class="stat-lbl">Máxima (min ${maxMinuto?.minuto}')</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--green)">${minOddH}</div><div class="stat-lbl">Mínima (min ${minMinuto?.minuto}')</div></div>
+      <div class="stat-box"><div class="stat-val">${(maxOddH-minOddH).toFixed(2)}</div><div class="stat-lbl">Amplitude</div></div>
+    </div>
 
-  // Link OddsPortal
-  const opSlug = /série b|serie b/i.test(comp) ? 'serie-b' : 'serie-a-betano'
-  document.getElementById('dpOddslink').href = `https://www.oddsportal.com/football/brazil/${opSlug}/results/`
+    <div class="section-title">Volatilidade por tempo</div>
+    <div class="trend-box">
+      <div class="trend-row"><span>1º Tempo (0-45')</span><span style="font-weight:600">${vol1}</span></div>
+      <div class="trend-row"><span>2º Tempo (46-90')</span><span style="font-weight:600">${vol2}</span></div>
+      <div class="trend-row"><span>Variação total</span>
+        <span class="${g.variacao_h<0?'trend-up':'trend-down'}" style="font-weight:600">${g.variacao_h>0?'+':''}${g.variacao_h}%</span>
+      </div>
+    </div>
 
-  document.getElementById('dpStats').innerHTML = `
-    <h4>Informações do Jogo</h4>
-    <p style="font-size:12px;color:var(--text2);line-height:1.8">
-      As estatísticas detalhadas do jogo (chutes, escanteios, cartões, posse de bola) estão disponíveis no 
-      <strong style="color:var(--text)">Flashscore</strong> — use o link abaixo para acessar.
-    </p>`
-
-  document.getElementById('detailPanel').classList.add('open')
+    <div class="section-title">Maior queda em 5 minutos</div>
+    <div class="trend-box">
+      ${maiorQueda.delta<0?`
+        <div class="trend-row"><span>Minuto</span><span>${maiorQueda.minuto}'</span></div>
+        <div class="trend-row"><span>Odd antes</span><span>${maiorQueda.de}</span></div>
+        <div class="trend-row"><span>Odd depois</span><span style="color:var(--green)">${maiorQueda.para}</span></div>
+        <div class="trend-row"><span>Variação</span><span class="trend-up">${maiorQueda.delta.toFixed(1)}%</span></div>
+      `:'<p style="font-size:12px;color:var(--text2)">Sem quedas significativas</p>'}
+    </div>
+  `
 }
 
-function closeDetail() {
-  document.getElementById('detailPanel').classList.remove('open')
-  document.querySelectorAll('.games-table tr').forEach(r=>r.classList.remove('selected'))
-}
-
-function resetApp() {
-  allGames=[]; filtered=[]; currentPage=1
+function resetApp(){
+  allGames={};allRows=[];filteredIds=[];selId=null
   document.getElementById('appScreen').style.display='none'
   document.getElementById('uploadScreen').style.display='flex'
   document.getElementById('csvFile').value=''
 }
 
-// Fechar ao clicar fora
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail() })
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){selId=null;renderGames()}})
 </script>
 </body>
 </html>
