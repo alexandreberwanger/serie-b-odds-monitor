@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odds Monitor · Série B</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #eeede9;
+    --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b96;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --info-bg: #e6f1fb; --info-text: #185fa5;
+    --success-bg: #eaf3de; --success-text: #3b6d11;
+    --danger-bg: #fcebeb; --danger-text: #a32d2d;
+    --r-md: 8px; --r-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
+      --text: #f0efe9; --text2: #9b9b96; --text3: #6b6b67;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --info-bg: #0c447c; --info-text: #b5d4f4;
+      --success-bg: #27500a; --success-text: #c0dd97;
+      --danger-bg: #791f1f; --danger-text: #f7c1c1;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+  .app { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+  .header { margin-bottom: 2rem; }
+  .header h1 { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .header h1 i { font-size: 20px; color: var(--info-text); }
+  .header p { font-size: 13px; color: var(--text2); margin-top: 5px; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; }
+  .api-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .api-bar input { flex: 1; height: 40px; padding: 0 12px; font-size: 14px; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg); color: var(--text); outline: none; }
+  .api-bar input:focus { border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+  .btn { height: 40px; padding: 0 18px; font-size: 14px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: background .15s; }
+  .btn:hover { background: var(--bg2); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: #378ADD; color: #fff; border-color: #378ADD; }
+  .btn.primary:hover { background: #185fa5; border-color: #185fa5; }
+  .status { display: none; font-size: 13px; padding: 10px 14px; border-radius: var(--r-md); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .status.info { background: var(--info-bg); color: var(--info-text); }
+  .status.success { background: var(--success-bg); color: var(--success-text); }
+  .status.error { background: var(--danger-bg); color: var(--danger-text); }
+  .status.hidden { display: none; }
+  @keyframes pulse { 0%,100%{opacity:.5}50%{opacity:1} }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.2s infinite; flex-shrink: 0; }
+  .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; margin-bottom: 1.25rem; padding: 1rem 1.25rem; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); }
+  .filter-group label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+  .filter-group input, .filter-group select { width: 100%; height: 36px; padding: 0 10px; font-size: 13px; border: 0.5px solid var(--border); border-radius: var(--r-md); background: var(--bg2); color: var(--text); outline: none; }
+  .filter-group input:focus, .filter-group select:focus { border-color: #378ADD; }
+  .games-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .games-header span { font-size: 13px; color: var(--text2); }
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .game-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; cursor: pointer; transition: border-color .15s, transform .1s; }
+  .game-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .game-card.active { border: 1.5px solid #378ADD; background: var(--info-bg); }
+  .game-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .team { font-size: 12px; font-weight: 500; color: var(--text); text-align: center; flex: 1; line-height: 1.3; }
+  .score-center { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .score-num { font-size: 20px; font-weight: 600; color: var(--text); }
+  .score-sep { font-size: 13px; color: var(--text3); }
+  .game-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 100px; font-weight: 500; }
+  .badge.finished { background: var(--success-bg); color: var(--success-text); }
+  .detail { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .detail-head { margin-bottom: 1.25rem; }
+  .detail-head h2 { font-size: 18px; font-weight: 600; }
+  .detail-head p { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .market-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mtab { height: 30px; padding: 0 14px; font-size: 12px; border: 0.5px solid var(--border); border-radius: 100px; background: var(--bg); color: var(--text2); cursor: pointer; transition: all .15s; }
+  .mtab.active { background: var(--bg2); color: var(--text); border-color: var(--border2); font-weight: 500; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+  .legend-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .chart-wrap { position: relative; width: 100%; height: 280px; }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 8px; margin-top: 1.25rem; }
+  .stat { background: var(--bg2); border-radius: var(--r-md); padding: 10px 14px; }
+  .stat-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-weight: 500; }
+  .stat-val { font-size: 20px; font-weight: 600; }
+  .stat-range { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .empty { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
+  .empty i { font-size: 32px; display: block; margin-bottom: 8px; }
+  .time-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
+  .time-filter label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .time-filter input[type=range] { flex: 1; accent-color: #378ADD; }
+  .time-filter span { font-size: 12px; font-weight: 500; min-width: 32px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-line"></i>Odds Monitor · Série B</h1>
+    <p>Histórico de odds minuto a minuto dos jogos finalizados do Campeonato Brasileiro Série B</p>
+  </div>
+
+  <div class="api-bar">
+    <input type="password" id="apiKey" placeholder="Cole sua API Key da OddsPapi" autocomplete="off">
+    <button class="btn primary" onclick="init()"><i class="ti ti-refresh"></i>Carregar jogos</button>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+
+  <div id="filtersSection" style="display:none">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Time</label>
+        <input type="text" id="fTeam" placeholder="Ex: Botafogo" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>De</label>
+        <input type="date" id="fFrom" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Até</label>
+        <input type="date" id="fTo" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Odd mínima</label>
+        <input type="number" id="fOddMin" step="0.01" min="1" placeholder="1.00">
+      </div>
+      <div class="filter-group">
+        <label>Odd máxima</label>
+        <input type="number" id="fOddMax" step="0.01" min="1" placeholder="99.00">
+      </div>
+      <div class="filter-group" style="display:flex;align-items:flex-end">
+        <button class="btn" onclick="clearFilters()" style="width:100%"><i class="ti ti-x"></i>Limpar filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gamesSection" style="display:none">
+    <div class="games-header">
+      <span id="gamesCount"></span>
+    </div>
+    <div class="games-grid" id="gamesGrid"></div>
+  </div>
+
+  <div id="detailSection" style="display:none">
+    <div class="detail">
+      <div class="detail-head">
+        <h2 id="detailTitle"></h2>
+        <p id="detailSub"></p>
+      </div>
+      <div class="time-filter">
+        <label><i class="ti ti-clock" style="vertical-align:-2px"></i> Min. início</label>
+        <input type="range" id="tMin" min="0" max="120" value="0" oninput="updateTimeFilter()">
+        <span id="tMinVal">0'</span>
+        <label>fim</label>
+        <input type="range" id="tMax" min="0" max="120" value="120" oninput="updateTimeFilter()">
+        <span id="tMaxVal">120'</span>
+        <button class="btn" onclick="resetTimeFilter()" style="height:28px;padding:0 10px;font-size:12px"><i class="ti ti-refresh"></i></button>
+      </div>
+      <div class="market-tabs" id="marketTabs"></div>
+      <div class="legend" id="chartLegend"></div>
+      <div class="chart-wrap">
+        <canvas id="oddsChart" role="img" aria-label="Evolução das odds ao longo do jogo"></canvas>
+      </div>
+      <div class="stats-row" id="statsRow"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://api.oddspapi.io/v4'
+const BOOKIE = 'pinnacle'
+const COLORS = ['#378ADD','#1D9E75','#D85A30','#BA7517','#D4537E','#639922','#534AB7']
+const MARKET_NAMES = {'1':'Resultado 1X2','10168':'Resultado 1X2','10':'Dupla Chance','20':'Ambas Marcam','5':'Total de Gols','6':'Handicap Asiático'}
+const OUTCOME_NAMES = {'1':'Casa','2':'Empate','3':'Fora','4':'Casa/Emp','5':'Casa/Fora','6':'Emp/Fora'}
+
+let apiKey='', serieBid=null, allFixtures=[], filteredFixtures=[]
+let selFixture=null, oddsData={}, chartInst=null, activeMarket=null
+let tMin=0, tMax=120
+
+function setStatus(msg, type='info') {
+  const el = document.getElementById('status')
+  el.className = `status ${type}`
+  el.innerHTML = `<span class="dot"></span>${msg}`
+  if (type==='error'||type==='success') setTimeout(()=>el.className='status hidden',5000)
+}
+
+async function apiFetch(path, params={}) {
+  const url = new URL(BASE+path)
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v))
+  const r = await fetch(url, {headers:{'x-api-key':apiKey}})
+  if (!r.ok) throw new Error(`HTTP ${r.status}`)
+  return r.json()
+}
+
+async function init() {
+  apiKey = document.getElementById('apiKey').value.trim()
+  if (!apiKey) { setStatus('Informe a API Key.','error'); return }
+  setStatus('Buscando torneios da Série B...')
+  try {
+    const data = await apiFetch('/tournaments', {sportId:1})
+    const items = Array.isArray(data)?data:(data.data||data.tournaments||[])
+    const found = items.find(t=>/serie.?b/i.test(t.name||'')&&/brazil/i.test(t.country||t.countryName||''))
+      || items.find(t=>/serie.?b.*brazil|brazil.*serie.?b/i.test(JSON.stringify(t)))
+    if (!found) {
+      const br = items.filter(t=>/brazil/i.test(JSON.stringify(t))).slice(0,4).map(t=>t.name).join(', ')
+      setStatus(`Série B não encontrada. Torneios BR: ${br||'nenhum'}`, 'error'); return
+    }
+    serieBid = String(found.id)
+    setStatus(`Série B encontrada (ID ${serieBid}). Carregando jogos...`)
+    await loadFixtures()
+  } catch(e) { setStatus(`Erro: ${e.message}`,'error') }
+}
+
+async function loadFixtures() {
+  try {
+    const data = await apiFetch('/fixtures', {tournamentId:serieBid,status:'finished'})
+    const items = Array.isArray(data)?data:(data.data||data.fixtures||[])
+    allFixtures = items.map(f=>{
+      const p=f.participants||[]
+      const h=p.find(x=>x.type==='home')||{}, a=p.find(x=>x.type==='away')||{}
+      return {id:String(f.id),home:h.name||'?',away:a.name||'?',date:f.startingAt||'',
+        status:f.state?.status||f.status||'',sh:f.scores?.home??null,sa:f.scores?.away??null}
+    }).sort((a,b)=>b.date.localeCompare(a.date))
+    filteredFixtures=[...allFixtures]
+    renderGames()
+    document.getElementById('filtersSection').style.display='block'
+    document.getElementById('gamesSection').style.display='block'
+    setStatus(`${allFixtures.length} jogos carregados. Clique em um jogo para ver as odds.`,'success')
+  } catch(e) { setStatus(`Erro ao carregar jogos: ${e.message}`,'error') }
+}
+
+function applyFilters() {
+  const team = document.getElementById('fTeam').value.trim().toLowerCase()
+  const from = document.getElementById('fFrom').value
+  const to   = document.getElementById('fTo').value
+  filteredFixtures = allFixtures.filter(f=>{
+    if (team && !f.home.toLowerCase().includes(team) && !f.away.toLowerCase().includes(team)) return false
+    if (from && f.date.slice(0,10)<from) return false
+    if (to   && f.date.slice(0,10)>to)   return false
+    return true
+  })
+  renderGames()
+}
+
+function clearFilters() {
+  ['fTeam','fFrom','fTo','fOddMin','fOddMax'].forEach(id=>document.getElementById(id).value='')
+  filteredFixtures=[...allFixtures]; renderGames()
+}
+
+function renderGames() {
+  const grid=document.getElementById('gamesGrid')
+  document.getElementById('gamesCount').textContent=`${filteredFixtures.length} jogo(s)`
+  if (!filteredFixtures.length) {
+    grid.innerHTML='<div class="empty"><i class="ti ti-search-off"></i>Nenhum jogo encontrado com esses filtros.</div>'
+    return
+  }
+  grid.innerHTML=filteredFixtures.map(f=>{
+    const d=f.date?new Date(f.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—'
+    const active=selFixture?.id===f.id?' active':''
+    return `<div class="game-card${active}" onclick="selectGame('${f.id}')">
+      <div class="game-teams">
+        <span class="team">${f.home}</span>
+        <div class="score-center">
+          <span class="score-num">${f.sh??'?'}</span>
+          <span class="score-sep">×</span>
+          <span class="score-num">${f.sa??'?'}</span>
+        </div>
+        <span class="team">${f.away}</span>
+      </div>
+      <div class="game-meta">
+        <span>${d}</span>
+        <span class="badge finished">finalizado</span>
+      </div>
+    </div>`
+  }).join('')
+}
+
+async function selectGame(id) {
+  selFixture=filteredFixtures.find(f=>f.id===id)
+  renderGames()
+  const sec=document.getElementById('detailSection')
+  sec.style.display='block'
+  sec.scrollIntoView({behavior:'smooth',block:'start'})
+  document.getElementById('detailTitle').textContent=`${selFixture.home}  ×  ${selFixture.away}`
+  const d=selFixture.date?new Date(selFixture.date).toLocaleString('pt-BR'):''
+  document.getElementById('detailSub').textContent=`${d}  ·  Placar final: ${selFixture.sh??'?'} × ${selFixture.sa??'?'}  ·  Pinnacle`
+  setStatus(`Carregando odds de ${selFixture.home} × ${selFixture.away}...`)
+  try {
+    const data=await apiFetch('/historical-odds',{fixtureId:id,bookmakers:BOOKIE})
+    oddsData=parseOdds(data,selFixture.date)
+    activeMarket=Object.keys(oddsData)[0]||null
+    renderMarketTabs(); renderChart()
+    setStatus('Odds carregadas.','success')
+  } catch(e) { setStatus(`Erro ao carregar odds: ${e.message}`,'error') }
+}
+
+function parseOdds(data, gameStart) {
+  const res={}
+  for (const [,bd] of Object.entries(data?.bookmakers||{})) {
+    for (const [mid,md] of Object.entries(bd.markets||{})) {
+      const mName=MARKET_NAMES[mid]||`Mercado ${mid}`
+      if (!res[mName]) res[mName]={}
+      for (const [oid,od] of Object.entries(md.outcomes||{})) {
+        const oName=OUTCOME_NAMES[oid]||`Resultado ${oid}`
+        const entries=Object.values(od.players||{}).flat()
+          .sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''))
+          .map(e=>{
+            const ts=new Date(e.createdAt)
+            let min=null
+            if (gameStart) { const diff=Math.round((ts-new Date(gameStart))/60000); if(diff>=0&&diff<=150) min=diff }
+            return {min,ts:e.createdAt,price:e.price,active:e.active}
+          }).filter(e=>e.min!==null)
+        if (entries.length>0) res[mName][oName]=entries
+      }
+    }
+  }
+  return res
+}
+
+function updateTimeFilter() {
+  tMin=+document.getElementById('tMin').value
+  tMax=+document.getElementById('tMax').value
+  document.getElementById('tMinVal').textContent=tMin+"'"
+  document.getElementById('tMaxVal').textContent=tMax+"'"
+  renderChart()
+}
+
+function resetTimeFilter() {
+  tMin=0; tMax=120
+  document.getElementById('tMin').value=0
+  document.getElementById('tMax').value=120
+  document.getElementById('tMinVal').textContent="0'"
+  document.getElementById('tMaxVal').textContent="120'"
+  renderChart()
+}
+
+function renderMarketTabs() {
+  document.getElementById('marketTabs').innerHTML=Object.keys(oddsData).map(m=>
+    `<button class="mtab${m===activeMarket?' active':''}" onclick="switchMarket('${m}')">${m}</button>`
+  ).join('')
+}
+
+function switchMarket(m) { activeMarket=m; renderMarketTabs(); renderChart() }
+
+function renderChart() {
+  const markets=oddsData[activeMarket]||{}
+  const outcomes=Object.entries(markets)
+  const oddMin=+document.getElementById('fOddMin').value||null
+  const oddMax=+document.getElementById('fOddMax').value||null
+
+  const legend=document.getElementById('chartLegend')
+  const statsRow=document.getElementById('statsRow')
+
+  if (!outcomes.length) {
+    legend.innerHTML=''; statsRow.innerHTML='<div class="empty">Sem dados para este mercado.</div>'
+    if(chartInst){chartInst.destroy();chartInst=null}; return
+  }
+
+  const datasets=outcomes.map(([name,entries],i)=>{
+    const pts=entries.filter(e=>e.min>=tMin&&e.min<=tMax&&(!oddMin||e.price>=oddMin)&&(!oddMax||e.price<=oddMax))
+    return {
+      label:name,
+      data:pts.map(e=>({x:`${e.min}'`,y:parseFloat(e.price.toFixed(3))})),
+      borderColor:COLORS[i%COLORS.length],
+      backgroundColor:COLORS[i%COLORS.length]+'22',
+      tension:0.35, pointRadius:4, pointHoverRadius:7,
+      fill:false, borderDash:i===2?[5,3]:undefined, borderWidth:2
+    }
+  })
+
+  legend.innerHTML=outcomes.map(([name],i)=>
+    `<span class="legend-item"><span class="legend-sq" style="background:${COLORS[i%COLORS.length]}"></span>${name}</span>`
+  ).join('')
+
+  const allP=outcomes.flatMap(([,e])=>e.map(x=>x.price)).filter(Boolean)
+  const minP=allP.length?Math.min(...allP):1, maxP=allP.length?Math.max(...allP):10
+
+  statsRow.innerHTML=outcomes.map(([name,entries],i)=>{
+    const p=entries.map(e=>e.price).filter(Boolean)
+    if(!p.length) return ''
+    const mn=Math.min(...p).toFixed(2), mx=Math.max(...p).toFixed(2), last=p[p.length-1].toFixed(2)
+    const trend=p.length>1?(p[p.length-1]-p[0]>0?'↑':'↓'):'—'
+    const trendColor=trend==='↑'?'#1D9E75':trend==='↓'?'#D85A30':''
+    return `<div class="stat">
+      <div class="stat-label" style="color:${COLORS[i%COLORS.length]}">${name}</div>
+      <div class="stat-val">${last} <span style="font-size:14px;color:${trendColor}">${trend}</span></div>
+      <div class="stat-range">mín ${mn} · máx ${mx}</div>
+    </div>`
+  }).join('')
+
+  if(chartInst) chartInst.destroy()
+  chartInst=new Chart(document.getElementById('oddsChart'),{
+    type:'line', data:{datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{type:'category',title:{display:true,text:'Minuto do jogo',font:{size:11},color:'#888'},ticks:{font:{size:11},maxRotation:45}},
+        y:{min:parseFloat((minP*.94).toFixed(2)),max:parseFloat((maxP*1.06).toFixed(2)),
+          title:{display:true,text:'Odd',font:{size:11},color:'#888'},
+          ticks:{font:{size:11},callback:v=>v.toFixed(2)}}
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`}}}
+    }
+  })
+}
+</script>
+</body>
+</html>
